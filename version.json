@@ -1,6 +1,6 @@
 {
-  "versionCode": 18,
-  "versionName": "3.7.79",
+  "versionCode": 19,
+  "versionName": "3.8.0",
   "url": "https://github.com/lzm-Python/agnes-update/releases/latest/download/AgnesVideo.apk",
-  "note": "Agnes 工作台最新版"
+  "note": "内置自动更新：启动静默检查，发现新版顶部提示一键下载"
 }
