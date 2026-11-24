@@ -1,6 +1,1 @@
-{
-  "versionCode": 19,
-  "versionName": "3.8.0",
-  "url": "https://github.com/lzm-Python/agnes-update/releases/latest/download/AgnesVideo.apk",
-  "note": "内置自动更新：启动静默检查，发现新版顶部提示一键下载"
-}
+{"versionCode":20,"versionName":"3.8.5","url":"https://github.com/lzm-Python/agnes-update/releases/latest/download/AgnesVideo.apk","note":"新增风格库：6 组 29 种风格，图片页和视频页一键套用"}
