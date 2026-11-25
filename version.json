@@ -1,6 +1,6 @@
 {
- "versionCode": 29,
- "versionName": "4.4",
+ "versionCode": 30,
+ "versionName": "4.5",
  "url": "https://github.com/lzm-Python/agnes-update/releases/latest/download/AgnesVideo.apk",
- "note": "修智谱视频尺寸：4:3、3:4、21:9 现在落到智谱认的 1280x720 / 720x1280，不再报不支持 size；智谱图片尺寸被拒时自动回落到 1024x1024；出图前清空上一次的候选小图"
+ "note": "模型名可自定义：引擎管理里每家三个模型名都能改，留空用内置，方便平台换模型时不用等新版；安卓 4.5 与电脑版 1.5 同批发布"
 }
