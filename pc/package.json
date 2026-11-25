@@ -1,6 +1,6 @@
 {
   "name": "agnes-workbench",
-  "version": "1.0.0",
+  "version": "1.5.0",
   "description": "Agnes 工作台 电脑版",
   "main": "main.js",
   "author": "Agnes",
@@ -29,11 +29,15 @@
       "target": [
         {
           "target": "nsis",
-          "arch": ["x64"]
+          "arch": [
+            "x64"
+          ]
         },
         {
           "target": "portable",
-          "arch": ["x64"]
+          "arch": [
+            "x64"
+          ]
         }
       ]
     },
