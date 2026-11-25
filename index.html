@@ -31,6 +31,17 @@ h2{font-size:14px;color:#cdd6e6;margin:26px 0 10px;font-weight:600}
 .step{display:flex;gap:10px;font-size:13px;padding:7px 0;color:#b9c4d8}
 .step b{flex:0 0 20px;height:20px;border-radius:50%;background:#1d2743;color:#9fb0ff;font-size:11.5px;font-weight:600;display:flex;align-items:center;justify-content:center}
 .foot{margin-top:26px;font-size:11.5px;color:#5f6a80;text-align:center;line-height:1.8}
+
+.devbox{margin-top:10px}
+.devlab{display:block;font-size:11.5px;color:#8b96ab;margin:9px 0 5px}
+.devin{width:100%;background:#0f1420;border:1px solid #26304a;border-radius:10px;color:#dfe6f2;font-size:13px;padding:10px 11px;font-family:inherit;outline:none}
+.devin:focus{border-color:#3d5cff}
+.devrow{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.devg{display:block;width:100%;margin-top:12px;padding:12px;border:0;border-radius:12px;background:linear-gradient(135deg,#2f6bff,#7b4dff);color:#fff;font-size:14px;font-weight:600;font-family:inherit;cursor:pointer}
+.out{margin-top:12px;background:#0f1420;border:1px dashed #33406a;border-radius:11px;padding:12px;display:none}
+.out.on{display:block}
+.outcode{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:17px;color:#a9c0ff;letter-spacing:1.2px;word-break:break-all;text-align:center;padding:6px 0}
+.devnote{font-size:11.5px;color:#6f7b93;margin-top:9px;line-height:1.65}
 </style>
 </head>
 <body>
@@ -97,6 +108,33 @@ h2{font-size:14px;color:#cdd6e6;margin:26px 0 10px;font-weight:600}
     <div class="ver"><span>v3.7.6 及更早</span><a href="https://github.com/lzm-Python/agnes-update/releases">全部版本</a></div>
   </div>
 
+
+  <h2>开发者模式</h2>
+  <div class="card">
+    <div class="li"><i></i><span>Windows 版默认隐藏开发者入口，需要激活文本才能解锁<span class="tag">4.3 上线</span></span></div>
+    <div class="li"><i></i><span>激活文本在本页面离线算出，本站不保存、不上传任何内容</span></div>
+    <div class="devbox">
+      <label class="devlab">设备码（在 App 设置页的开发者模式里复制）</label>
+      <input class="devin" id="dCode" placeholder="例如 A1B2C3D4" maxlength="32" autocomplete="off">
+      <div class="devrow">
+        <div>
+          <label class="devlab">使用人（可不填）</label>
+          <input class="devin" id="dName" placeholder="只做备注" maxlength="16" autocomplete="off">
+        </div>
+        <div>
+          <label class="devlab">有效期</label>
+          <input class="devin" id="dDays" value="90" inputmode="numeric" maxlength="5">
+        </div>
+      </div>
+      <button class="devg" onclick="devGen()">生成激活文本</button>
+      <div class="out" id="dOut">
+        <div class="outcode" id="dText">—</div>
+        <a class="btn alt" href="javascript:devCopy()" style="margin-top:6px">复制激活文本</a>
+        <div class="devnote" id="dInfo"></div>
+      </div>
+      <div class="devnote">用设备码加有效期算出一串校验码，App 端用同一算法核对，对得上就解锁。这一串只跟设备码和日期有关，换设备要重新生成；有效期填 0 表示长期。</div>
+    </div>
+  </div>
   <h2>文件信息</h2>
   <div class="card">
     <div class="ver"><span>包名</span><span class="mono">com.agnes.video</span></div>
@@ -112,5 +150,32 @@ h2{font-size:14px;color:#cdd6e6;margin:26px 0 10px;font-weight:600}
   </div>
 
 </div>
+
+<script>
+var SALT="AGNES-DEV-2026-LZM";
+async function sha(t){var b=new TextEncoder().encode(t);var d=await crypto.subtle.digest("SHA-256",b);return Array.from(new Uint8Array(d)).map(function(x){return ("0"+x.toString(16)).slice(-2)}).join("").toUpperCase();}
+function yy(d){var p=function(n){return ("0"+n).slice(-2)};return String(d.getFullYear()).slice(2)+p(d.getMonth()+1)+p(d.getDate());}
+async function devGen(){
+  var raw=document.getElementById("dCode").value.toUpperCase().replace(/[^0-9A-F]/g,"");
+  if(raw.length<8){alert("设备码是 8 位十六进制，在 App 里复制过来");return;}
+  raw=raw.slice(0,8);
+  var days=parseInt(document.getElementById("dDays").value||"0",10);
+  if(isNaN(days)||days<0){days=0;}
+  var exp="000000";
+  if(days>0){var t=new Date();t.setDate(t.getDate()+days);exp=yy(t);}
+  var sig=(await sha(SALT+"|"+raw+"|"+exp)).slice(0,6);
+  var txt="AGN-"+raw+"-"+exp+"-"+sig;
+  document.getElementById("dText").textContent=txt.replace(/AGN-(.{8})-(.{6})-(.{6})/,"AGN-$1-$2-$3");
+  document.getElementById("dOut").className="out on";
+  var nm=document.getElementById("dName").value.trim();
+  document.getElementById("dInfo").textContent="设备码 "+raw+" · 有效期 "+(days>0?("至 "+exp.slice(0,2)+"年"+exp.slice(2,4)+"月"+exp.slice(4)+"日"):"长期")+(nm?(" · 使用者 "+nm):"")+"。复制后粘到 App 的开发者模式输入框。";
+}
+function devCopy(){
+  var t=document.getElementById("dText").textContent;
+  if(!t||t==="—"){return;}
+  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(function(){alert("已复制");},function(){alert("复制失败，长按上面的文本手动选");});}
+  else{alert("请长按上面的文本手动复制");}
+}
+</script>
 </body>
 </html>
