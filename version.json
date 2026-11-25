@@ -1,6 +1,6 @@
 {
- "versionCode": 23,
- "versionName": "3.9.0",
+ "versionCode": 25,
+ "versionName": "4.0",
  "url": "https://github.com/lzm-Python/agnes-update/releases/latest/download/AgnesVideo.apk",
- "note": "引擎层重构：Pavo 与 DeepSeek 可切换，剧本可选 DeepSeek 写；Key 按引擎分别保存，互不影响；报错改成中文并附服务端原文"
+ "note": "接入智谱视频：文生视频走异步任务，自动轮询出结果；文本、图片、视频三类都能各自选引擎"
 }
