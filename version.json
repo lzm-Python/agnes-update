@@ -1,6 +1,6 @@
 {
- "versionCode": 25,
- "versionName": "4.0",
+ "versionCode": 26,
+ "versionName": "4.1",
  "url": "https://github.com/lzm-Python/agnes-update/releases/latest/download/AgnesVideo.apk",
- "note": "接入智谱视频：文生视频走异步任务，自动轮询出结果；文本、图片、视频三类都能各自选引擎"
+ "note": "引擎管理页：每个引擎一张卡，Key 分别保存、可一键测试连接；没填 Key 的引擎不影响别的功能"
 }
