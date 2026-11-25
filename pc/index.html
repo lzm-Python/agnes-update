@@ -201,7 +201,7 @@ border-radius:9px;padding:9px;font-size:11.5px;margin-top:10px;font-family:inher
   <label>引擎管理（Key 各存各的，不填不影响别的引擎）</label>
   <div id="englist"></div>
   <div class="sep"></div>
-  <div class="vrow"><span>当前版本</span><b id="vernow">4.3</b></div>
+  <div class="vrow"><span>当前版本</span><b id="vernow">4.5</b></div>
   <div class="vrow"><span>接收测试版（3.9.5 起）</span><b id="betatog" onclick="toggleBeta()" style="cursor:pointer">关</b></div>
   <div class="vrow"><span>写实约束（治"不符合实际"）</span><b id="realtog" onclick="toggleReal()" style="cursor:pointer">开</b></div>
   <label>更新源地址（已内置，一般不用改）</label>
@@ -424,12 +424,21 @@ var ENGINES={
     cap:['img','vid','txt'],proto:'openai'}
 };
 var curE={img:'pavo',vid:'pavo',txt:'pavo'};
+function modelOf(id,kind){
+  var e=ENGINES[id];if(!e)return '';
+  var v=(localStorage.getItem('agnes_m_'+id+'_'+kind)||'').trim();
+  return v||e[kind]||'';
+}
+function setModel(id,kind,name){
+  var k='agnes_m_'+id+'_'+kind;
+  if(name)localStorage.setItem(k,name);else localStorage.removeItem(k);
+}
 var API=ENGINES.pavo.base;
 var IMG_MODEL=ENGINES.pavo.img;
 var VID_MODEL=ENGINES.pavo.vid;
 var TXT_MODEL=ENGINES.pavo.txt;
 
-var APP_VER='4.3',APP_CODE=28;
+var APP_VER='4.5',APP_CODE=30;
 
 // ===== 自动更新源（内置，按速度快慢排序）=====
 var UPD_SRC=[
@@ -468,8 +477,8 @@ function imgSizeParam(){
 function vidSizeParam(){
   var e=engOf('vid');
   if(e.proto==='pavo')return '720P';
-  var m={'9:16':'720x1280','16:9':'1280x720','1:1':'1024x1024','4:3':'1152x864','3:4':'864x1152','21:9':'1280x548'};
-  return m[$('vratio').value]||'720x1280';
+  var m={'9:16':'720x1280','16:9':'1280x720','1:1':'1024x1024','4:3':'1280x720','3:4':'720x1280','21:9':'1280x720'};
+  return m[$('vratio').value]||'1280x720';
 }
 function vidPollURL(vid){var e=engOf('vid');return e.base+'/agnesapi?video_id='+encodeURIComponent(vid)+'&model_name='+encodeURIComponent(e.vid)}
 function tip(m){var t=$('toast');t.textContent=m;t.className='toast show';setTimeout(function(){t.className='toast'},1800)}
@@ -878,6 +887,12 @@ function renderEngines(){
       +'<b style="font-size:13px">'+e.n+'</b>'
       +'<span style="font-size:11px;color:var(--dim2,#8b96ab)">'+capsOf(e)+'</span></div>'
       +'<input id="ek-'+id+'" type="password" placeholder="'+(has?'已填，可覆盖':'还没填')+'" autocomplete="off">'
+      +'<div style="display:flex;gap:6px;margin-top:8px">'
+      +'<input id="em-img-'+id+'" placeholder="图片模型" style="font-size:11.5px" autocomplete="off">'
+      +'<input id="em-vid-'+id+'" placeholder="视频模型" style="font-size:11.5px" autocomplete="off">'
+      +'<input id="em-txt-'+id+'" placeholder="文本模型" style="font-size:11.5px" autocomplete="off">'
+      +'</div>'
+      +'<button class="btn ghost" style="margin:0;margin-top:8px;padding:8px;font-size:12.5px" onclick="saveEngModel(\''+id+'\')">保存模型名（留空用内置）</button>'
       +'<div style="display:flex;gap:8px;margin-top:8px">'
       +'<button class="btn ghost" style="margin:0;flex:1;padding:8px;font-size:12.5px" onclick="saveEngKey(\''+id+'\')">保存</button>'
       +'<button class="btn ghost" style="margin:0;flex:1;padding:8px;font-size:12.5px" onclick="testEng(\''+id+'\')">测试连接</button></div>'
@@ -885,7 +900,22 @@ function renderEngines(){
     box.appendChild(d);
     var inp=d.querySelector('#ek-'+id);
     if(inp)inp.value=engKey(id);
+    ['img','vid','txt'].forEach(function(kd){
+      var el=d.querySelector('#em-'+kd+'-'+id);
+      if(el)el.value=(localStorage.getItem('agnes_m_'+id+'_'+kd)||'');
+    });
   });
+}
+function saveEngModel(id){
+  var e=ENGINES[id];if(!e)return;
+  ['img','vid','txt'].forEach(function(kd){
+    var el=$('em-'+kd+'-'+id);
+    if(!el)return;
+    var v=(el.value||'').trim();
+    if(!e.cap||e.cap.indexOf(kd)<0){if(v)setModel(id,kd,'');return}
+    setModel(id,kd,v);
+  });
+  tip(ENGINES[id].n+' 模型名已保存');
 }
 function saveEngKey(id){
   var el=$('ek-'+id);
@@ -961,10 +991,6 @@ function syncGid(){
   return v||localStorage.getItem('agnes_sync_gid')||'';
 }
 function syncSt(t){var e=syncEl('gsync_st');if(e)e.textContent=t}
-function syncTitle(t){
-  var a=document.querySelectorAll('.ttl');
-  return t;
-}
 function syncPack(){
   var plain={},deep={};
   for(var i=0;i<localStorage.length;i++){
@@ -1161,19 +1187,26 @@ function refWPref(nr){
 function imgOnce(p,nr){
   var en=engOf('img');
   var pref=refWPref(nr)+refPrefix(p,nr);
-  var ipayload={model:en.img,prompt:withReal(pref+p,REAL_IMG),size:imgSizeParam()};
-  if(en.proto==='pavo'){ipayload.size=imgSize;ipayload.ratio=imgRatio;}
-  if(nr&&en.proto==='pavo'){ipayload.image=refs.img.slice();}
-  return fetch(imgURL(),{method:'POST',headers:{'Authorization':'Bearer '+keyFor('img'),'Content-Type':'application/json'},
-    body:JSON.stringify(ipayload)
-  }).then(function(r){return r.json().then(function(j){return {ok:r.ok,code:r.status,j:j}})})
-  .then(function(res){
-    if(!res.ok){var e=new Error('api');e.code=res.code;e.j=res.j;throw e}
-    var d=(res.j.data&&res.j.data[0])||res.j;
-    var url=d.url||(d.b64_json?('data:image/png;base64,'+d.b64_json):null);
-    if(!url){var e2=new Error('noimg');e2.code=0;throw e2}
-    return url;
-  });
+  function go(size){
+    var ipayload={model:modelOf(curE.img,'img'),prompt:withReal(pref+p,REAL_IMG),size:size};
+    if(en.proto==='pavo'){ipayload.size=imgSize;ipayload.ratio=imgRatio;}
+    if(nr&&en.proto==='pavo'){ipayload.image=refs.img.slice();}
+    return fetch(imgURL(),{method:'POST',headers:{'Authorization':'Bearer '+keyFor('img'),'Content-Type':'application/json'},
+      body:JSON.stringify(ipayload)
+    }).then(function(r){return r.json().then(function(j){return {ok:r.ok,code:r.status,j:j}})})
+    .then(function(res){
+      if(!res.ok){
+        var m=apiMsg(res.j);
+        if(size!=='1024x1024'&&/size/i.test(m)){return go('1024x1024')}
+        var e=new Error('api');e.code=res.code;e.j=res.j;throw e;
+      }
+      var d=(res.j.data&&res.j.data[0])||res.j;
+      var url=d.url||(d.b64_json?('data:image/png;base64,'+d.b64_json):null);
+      if(!url){var e2=new Error('noimg');e2.code=0;throw e2}
+      return url;
+    });
+  }
+  return go(imgSizeParam());
 }
 function showCands(urls){
   var box=$('icands');if(!box)return;
@@ -1200,6 +1233,7 @@ function genImage(){
   if(!p){err('ierr','先写提示词');return}
   busy.img=true;
   $('igo').disabled=true;$('igo').textContent='出图中…';
+  var candBox=$('icands');if(candBox){candBox.style.display='none';candBox.innerHTML=''}
   var nr=refs.img.length;
   if(imgSize!=='1K'&&imgSize!=='2K'){imgSize='1K'}
   var en=engOf('img');
@@ -1313,7 +1347,7 @@ function genVideo(){
     rawP=pr.txt;
   }
   var ven=engOf('vid');
-  var body={model:ven.vid,mode:vMode,prompt:withReal(rawP,REAL_VID),seconds:$('vsec').value,size:'720P',aspect_ratio:$('vratio').value};
+  var body={model:modelOf(curE.vid,'vid'),mode:vMode,prompt:withReal(rawP,REAL_VID),seconds:$('vsec').value,size:'720P',aspect_ratio:$('vratio').value};
   if(!body.prompt){err('verr','先写提示词');return}
   if(vMode==='text'&&local.length){body.mode='keyframe';body.first_frame=local[0]}
   if(vMode==='keyframe'){
@@ -1328,7 +1362,7 @@ function genVideo(){
   }
   if(ven.proto!=='pavo'){
     if(vMode!=='text'){tip(ven.n+' 只做文生视频，已按文生视频提交')}
-    body={model:ven.vid,prompt:withReal(rawP,REAL_VID),size:vidSizeParam(),with_audio:false,quality:'quality'};
+    body={model:modelOf(curE.vid,'vid'),prompt:withReal(rawP,REAL_VID),size:vidSizeParam(),with_audio:false,quality:'quality'};
   }
   busy.vid=true;
   $('vgo').disabled=true;$('vgo').textContent='提交中…';
@@ -1473,7 +1507,7 @@ function genScript(){
       pics.forEach(function(u){msg.content.push({type:'image_url',image_url:{url:u}})});
     }
     var ten=engOf('txt');
-    var payload={model:ten.txt,messages:[{role:'system',content:sys},msg],temperature:0.8};
+    var payload={model:modelOf(curE.txt,'txt'),messages:[{role:'system',content:sys},msg],temperature:0.8};
     return fetch(txtURL(),{method:'POST',headers:{'Authorization':'Bearer '+keyFor('txt'),'Content-Type':'application/json'},
       body:JSON.stringify(payload)})
     .then(function(r){return r.json().then(function(j){return {ok:r.ok,code:r.status,j:j}})})
