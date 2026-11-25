@@ -1,6 +1,6 @@
 {
- "versionCode": 28,
- "versionName": "4.3",
+ "versionCode": 29,
+ "versionName": "4.4",
  "url": "https://github.com/lzm-Python/agnes-update/releases/latest/download/AgnesVideo.apk",
- "note": "双端同步（GitHub Gist：历史、收藏、风格、引擎开关，Key 不上传）；图片/视频历史支持搜提示词；开发者模式入口上线但暂未开放；电脑版首发 1.0"
+ "note": "修智谱视频尺寸：4:3、3:4、21:9 现在落到智谱认的 1280x720 / 720x1280，不再报不支持 size；智谱图片尺寸被拒时自动回落到 1024x1024；出图前清空上一次的候选小图"
 }
