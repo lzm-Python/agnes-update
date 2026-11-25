@@ -181,27 +181,17 @@ border-radius:9px;padding:9px;font-size:11.5px;margin-top:10px;font-family:inher
   <div class="sep"></div>
   <div class="sep"></div>
   <label>剧本用哪个引擎</label>
-  <div class="chips" id="etxt">
-    <div class="chip on" data-v="pavo">Pavo</div>
-    <div class="chip" data-v="deepseek">DeepSeek</div>
-    <div class="chip" data-v="zhipu">智谱</div>
-  </div>
+  <div class="chips" id="etxt"></div>
   <label>图片用哪个引擎</label>
-  <div class="chips" id="eimg">
-    <div class="chip on" data-v="pavo">Pavo</div>
-    <div class="chip" data-v="zhipu">智谱</div>
-  </div>
+  <div class="chips" id="eimg"></div>
   <label>视频用哪个引擎</label>
-  <div class="chips" id="evid">
-    <div class="chip on" data-v="pavo">Pavo</div>
-    <div class="chip" data-v="zhipu">智谱</div>
-  </div>
+  <div class="chips" id="evid"></div>
 
   <div class="sep"></div>
   <label>引擎管理（Key 各存各的，不填不影响别的引擎）</label>
   <div id="englist"></div>
   <div class="sep"></div>
-  <div class="vrow"><span>当前版本</span><b id="vernow">4.5</b></div>
+  <div class="vrow"><span>当前版本</span><b id="vernow">4.6</b></div>
   <div class="vrow"><span>接收测试版（3.9.5 起）</span><b id="betatog" onclick="toggleBeta()" style="cursor:pointer">关</b></div>
   <div class="vrow"><span>写实约束（治"不符合实际"）</span><b id="realtog" onclick="toggleReal()" style="cursor:pointer">开</b></div>
   <label>更新源地址（已内置，一般不用改）</label>
@@ -421,7 +411,16 @@ var ENGINES={
     cap:['txt'],proto:'openai'},
   zhipu:{n:'智谱',base:'https://open.bigmodel.cn/api/paas/v4',k:'agnes_key_glm',
     img:'cogview-3-flash',vid:'cogvideox-flash',txt:'GLM-4.7-Flash',
-    cap:['img','vid','txt'],proto:'openai'}
+    cap:['img','vid','txt'],proto:'openai'},
+  siliconflow:{n:'硅基流动',base:'https://api.siliconflow.cn/v1',k:'agnes_key_sf',
+    img:'Kwai-Kolors/Kolors',vid:'',txt:'Qwen/Qwen2.5-7B-Instruct',
+    cap:['img','txt'],proto:'openai'},
+  bailian:{n:'百炼',base:'https://dashscope.aliyuncs.com/compatible-mode/v1',k:'agnes_key_bl',
+    img:'',vid:'',txt:'qwen-flash',
+    cap:['txt'],proto:'openai'},
+  ark:{n:'火山方舟',base:'https://ark.cn-beijing.volces.com/api/v3',k:'agnes_key_ark',
+    img:'doubao-seedream-3-0-t2i-250415',vid:'',txt:'doubao-seed-1-6-flash-250828',
+    cap:['img','txt'],proto:'openai'}
 };
 var curE={img:'pavo',vid:'pavo',txt:'pavo'};
 function modelOf(id,kind){
@@ -438,7 +437,7 @@ var IMG_MODEL=ENGINES.pavo.img;
 var VID_MODEL=ENGINES.pavo.vid;
 var TXT_MODEL=ENGINES.pavo.txt;
 
-var APP_VER='4.5',APP_CODE=30;
+var APP_VER='4.6',APP_CODE=31;
 
 // ===== 自动更新源（内置，按速度快慢排序）=====
 var UPD_SRC=[
@@ -868,6 +867,28 @@ function needKey(kind){
 }
 function openKey(){$('keycard').classList.remove('hide');$('keyinput').value=getKey();window.scrollTo({top:0,behavior:'smooth'})}
 function toggleKey(){var c=$('keycard');if(c.classList.contains('hide')){openKey()}else{c.classList.add('hide')}}
+function renderEngineChips(){
+  [['etxt','txt'],['eimg','img'],['evid','vid']].forEach(function(t){
+    var box=$(t[0]);if(!box)return;
+    box.innerHTML='';
+    Object.keys(ENGINES).forEach(function(id){
+      var e=ENGINES[id];
+      if(!e.cap||e.cap.indexOf(t[1])<0)return;
+      var c=document.createElement('div');
+      c.className='chip'+(curE[t[1]]===id?' on':'');
+      c.dataset.v=id;
+      c.textContent=e.n;
+      c.onclick=function(){
+        Array.prototype.forEach.call(box.querySelectorAll('.chip'),function(x){x.classList.remove('on')});
+        c.classList.add('on');
+        if(t[1]==='txt')setEngTxt(id);
+        else if(t[1]==='img')setEngImg(id);
+        else setEngVid(id);
+      };
+      box.appendChild(c);
+    });
+  });
+}
 function setEngVid(v){
   if(!ENGINES[v])return;
   curE.vid=v;
@@ -1562,13 +1583,7 @@ applyTheme(localStorage.getItem('agnes_theme')||'dark');
 renderImgHist();renderVidHist();
 $('vernow').textContent=APP_VER+'（'+APP_CODE+'）';
 $('realtog').textContent=realOn()?'开':'关';
-bindChips('etxt',setEngTxt);
-Array.prototype.forEach.call(document.querySelectorAll('#etxt .chip'),function(c){c.classList.toggle('on',c.dataset.v===curE.txt)});
-
-bindChips('eimg',setEngImg);
-Array.prototype.forEach.call(document.querySelectorAll('#eimg .chip'),function(c){c.classList.toggle('on',c.dataset.v===curE.img)});
-bindChips('evid',setEngVid);
-Array.prototype.forEach.call(document.querySelectorAll('#evid .chip'),function(c){c.classList.toggle('on',c.dataset.v===curE.vid)});
+renderEngineChips();
 renderEngines();
 $('betatog').textContent=isBeta()?'开':'关';
 $('usrc').value=localStorage.getItem('agnes_upd')||'';
