@@ -1,0 +1,47 @@
+{
+  "name": "agnes-workbench",
+  "version": "1.0.0",
+  "description": "Agnes 工作台 电脑版",
+  "main": "main.js",
+  "author": "Agnes",
+  "license": "UNLICENSED",
+  "scripts": {
+    "sync": "node sync.js",
+    "start": "node sync.js && electron .",
+    "dist": "node sync.js && electron-builder --win nsis portable --x64"
+  },
+  "devDependencies": {
+    "electron": "33.4.11",
+    "electron-builder": "25.1.8"
+  },
+  "build": {
+    "appId": "com.agnes.workbench",
+    "productName": "AgnesWorkbench",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "app/**/*"
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": ["x64"]
+        },
+        {
+          "target": "portable",
+          "arch": ["x64"]
+        }
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "shortcutName": "Agnes 工作台"
+    }
+  }
+}
