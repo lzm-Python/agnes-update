@@ -31,6 +31,11 @@ h2{font-size:14px;color:#cdd6e6;margin:26px 0 10px;font-weight:600}
 .step{display:flex;gap:10px;font-size:13px;padding:7px 0;color:#b9c4d8}
 .step b{flex:0 0 20px;height:20px;border-radius:50%;background:#1d2743;color:#9fb0ff;font-size:11.5px;font-weight:600;display:flex;align-items:center;justify-content:center}
 .foot{margin-top:26px;font-size:11.5px;color:#5f6a80;text-align:center;line-height:1.8}
+
+.pcg{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:10px}
+.pcg .b{display:block;text-decoration:none;text-align:center;padding:13px 8px;border-radius:13px;background:transparent;border:1px solid #2c3550;color:#b9c4da;font-size:13.5px;font-weight:500}
+.pcg .b small{display:block;font-size:10.5px;color:#6f7b93;font-weight:400;margin-top:2px}
+.pcg .b.dis{color:#79849c;border-style:dashed;border-color:#2a3555}
 </style>
 </head>
 <body>
@@ -50,6 +55,17 @@ h2{font-size:14px;color:#cdd6e6;margin:26px 0 10px;font-weight:600}
   <a class="btn alt" href="https://github.com/lzm-Python/agnes-update/releases/latest/download/AgnesVideo.apk">原站直连（可能较慢）</a>
   <a class="btn alt" href="https://cdn.jsdelivr.net/gh/lzm-Python/agnes-update@main/apk/AgnesVideo.apk">CDN 备用线路</a>
   <p style="font-size:12px;color:#788396;margin:10px 2px 0;line-height:1.55">四个按钮都是 .apk 直链；万一手机把它存成压缩包，把后缀改回 .apk 就能装。</p>
+
+  <h2>Windows 电脑版</h2>
+  <div class="card">
+    <div class="li"><i></i><span>横版界面，按窗口宽度排多栏，不用竖屏，也不是手机版拉伸<span class="tag">4.3 首发</span></span></div>
+    <div class="li"><i></i><span>免安装绿色版，解压双击即用；与手机版同源，历史可互相导入</span></div>
+    <div class="pcg">
+      <a class="b dis">Windows 64 位<small>即将上线</small></a>
+      <a class="b dis">Windows 32 位<small>即将上线</small></a>
+    </div>
+    <p style="font-size:12px;color:#788396;margin:11px 2px 0;line-height:1.55">两个包分别对应 64 位和 32 位系统；老机器装 32 位版，其余装 64 位版。首发时这两个按钮换成真实下载地址。</p>
+  </div>
 
   <div class="grid">
     <div class="cell"><b>45 KB</b><span>安装包体积</span></div>
