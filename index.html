@@ -94,8 +94,8 @@ color:var(--txt);font-size:13.5px;font-weight:500;text-decoration:none;box-shado
 
   <h2>Windows / Linux 电脑版</h2>
   <div class="card">
-    <div class="li"><i></i><span>横版界面，按窗口宽度排多栏；与手机版同一份前端<span class="tag">未开放</span></span></div>
-    <div class="li"><i></i><span>剪辑与去水印为 Windows 独占，稍后单独上线<span class="tag">暂未开放</span></span></div>
+    <div class="li"><i></i><span>横版界面，按窗口宽度排多栏；与手机版同一份前端<span class="tag">已发布</span></span></div>
+    <div class="li"><i></i><span>剪辑与去水印为 Windows 独占，稍后单独上线<span class="tag">开发中</span></span></div>
     <div class="pcg">
       <a class="b" href="https://github.com/lzm-Python/agnes-update/releases/download/pc-v1.5/Agnes_1.0_win64_setup.exe">Windows 64 位 安装版<small>.exe 安装器 · 推荐</small></a>
       <a class="b" href="https://github.com/lzm-Python/agnes-update/releases/download/pc-v1.5/Agnes_1.0_win64_portable.exe">Windows 64 位 绿色版<small>.exe 免安装，双击即用</small></a>
@@ -105,7 +105,7 @@ color:var(--txt);font-size:13.5px;font-weight:500;text-decoration:none;box-shado
       <a class="b" href="https://github.com/lzm-Python/agnes-update/releases/download/pc-v1.5/agnes_1.0_linux_amd64.tar.gz">Linux 绿色版<small>.tar.gz 解压即用，可改前端代码</small></a>
       <a class="b full" href="https://github.com/lzm-Python/agnes-update/releases/download/pc-v1.5/install-guide.txt">安装指导（第一次装先看这个）<small>说明该下哪个包、怎么装、绿色版怎么用</small></a>
     </div>
-    <p style="font-size:12px;color:#788396;margin:11px 2px 0;line-height:1.55">电脑版 1.0 已随安卓 4.3 同步发布。安装版装到系统里、有桌面图标；绿色版是单个 exe，不写注册表、拷走就能用。电脑版版本号从 1.0 起独立走，安卓每发一版它就跟一版。剪辑与去水印为 Windows 独占，稍后单独上线。</p>
+    <p style="font-size:12px;color:#788396;margin:11px 2px 0;line-height:1.55">电脑版版本号从 1.0 起独立走，安卓每发一版它就跟一版；当前 2.5 对应安卓 4.7。剪辑与去水印为 Windows 独占，稍后单独上线。</p>
   </div>
 
   <div class="grid">
@@ -156,7 +156,7 @@ color:var(--txt);font-size:13.5px;font-weight:500;text-decoration:none;box-shado
 
   <h2>开发者模式</h2>
   <div class="card">
-    <div class="li"><i></i><span>Windows 版与 Linux 版默认隐藏开发者入口，都要激活文本才能解锁；安卓版不提供开发者模式<span class="tag">暂未开放</span></span></div>
+    <div class="li"><i></i><span>Windows 版与 Linux 版默认隐藏开发者入口，都要激活文本才能解锁；安卓版不提供开发者模式<span class="tag">开发中</span></span></div>
     <div class="li"><i></i><span>激活文本在本页面离线算出，本站不保存、不上传任何内容</span></div>
     <div class="devbox">
       <label class="devlab">设备码（在电脑版 App 的开发者模式里复制）</label>
@@ -171,13 +171,13 @@ color:var(--txt);font-size:13.5px;font-weight:500;text-decoration:none;box-shado
           <input class="devin" id="dDays" value="90" inputmode="numeric" maxlength="5">
         </div>
       </div>
-      <button class="devg off" onclick="devSoon()">生成激活文本 · 暂未开放</button>
+      <button class="devg" onclick="devSoon()">生成激活文本</button>
       <div class="out" id="dOut">
         <div class="outcode" id="dText">—</div>
         <a class="btn alt" href="javascript:devCopy()" style="margin-top:6px">复制激活文本</a>
         <div class="devnote" id="dInfo"></div>
       </div>
-      <div class="devnote">当前暂未开放，先占位。4.3 上线后此处恢复。用设备码加有效期算出一串校验码，App 端用同一算法核对，对得上就解锁。这一串只跟设备码和日期有关，换设备要重新生成；有效期填 0 表示长期。</div>
+      <div class="devnote">用设备码加有效期算出一串校验码，App 端用同一算法核对，对得上就解锁。这一串只跟设备码和日期有关，换设备要重新生成；有效期填 0 表示长期。电脑版开发者模式尚在接入，接入后这里即可生成。</div>
     </div>
   </div>
   <h2>文件信息</h2>
@@ -222,6 +222,6 @@ function devCopy(){
   else{alert("请长按上面的文本手动复制");}
 }
 </script>
-<script>function devSoon(){alert("开发者模式暂未开放，等 4.3 版本上线后再来生成激活文本");}</script>
+<script>function devSoon(){alert("电脑版开发者模式正在接入，接入后这里就能生成激活文本");}</script>
 </body>
 </html>
