@@ -1,6 +1,6 @@
 {
- "versionCode": 31,
- "versionName": "4.6",
+ "versionCode": 32,
+ "versionName": "4.7",
  "url": "https://github.com/lzm-Python/agnes-update/releases/latest/download/AgnesVideo.apk",
- "note": "引擎扩到六家：新增硅基流动（图片 Kolors、文本 Qwen）、百炼（文本 qwen-flash）、火山方舟（图片 Seedream、文本 doubao）；设置页三个选择条按引擎能力自动生成，不支持的能力不会出现在选项里"
+ "note": "UI 大改：白天模式为默认，可一键切黑夜；设置拆成独立整页，引擎与 Key 单列一页；底部导航重新排布；引擎扩到九家，新增 OpenRouter、Groq、Kimi"
 }
