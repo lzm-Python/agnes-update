@@ -1,0 +1,49 @@
+Agnes 工作台 · 鸿蒙版（HAP）工程说明
+=====================================
+
+一、这是什么
+用 ArkTS + ArkUI 做的最小外壳，主体是一个 Web 组件，加载的就是你项目里同一份前端
+index.html（已放在 entry/src/main/resources/rawfile/index.html，86KB，4.7.5 版）。
+所以九家引擎、图片、视频、剧本、风格库、设置、主题切换全部照旧，不用重写。
+
+相比安卓壳，只有三处用了鸿蒙 API：
+1. 网络：Web 组件走系统网络栈，只需 module.json5 里声明 ohos.permission.INTERNET
+2. 保存文件：注册 WebDownloadDelegate，把浏览器下载动作落到应用沙箱
+   filesDir/downloads 目录，不再依赖 Android.saveFile 桥
+3. 提词器常亮：暂未接（鸿蒙对应 window.setWindowKeepScreenOn，需要时可加）
+
+二、目录结构
+harmony/
+├─ AppScope/app.json5                 包名 com.agnes.video、版本 4.7.5
+├─ build-profile.json5                编译配置，compatibleSdkVersion 5.0.0(12)
+├─ hvigorfile.ts / oh-package.json5
+└─ entry/
+   ├─ build-profile.json5 / hvigorfile.ts / oh-package.json5
+   └─ src/main/
+      ├─ module.json5                 入口声明、INTERNET 权限
+      ├─ ets/entryability/EntryAbility.ets
+      ├─ ets/pages/Index.ets          Web 组件 + 下载代理
+      └─ resources/
+         ├─ rawfile/index.html        整个前端
+         └─ base/{element,media,profile}
+
+三、怎么出 HAP（这台机器上没有 DevEco，所以没出包）
+1. 装 DevEco Studio（华为官网开发者下载，5.0 以上），首次启动装 HarmonyOS SDK（API 12 或 15）
+2. DevEco → Open → 选 harmony 这个目录，等 sync 完成（会自动拉 hvigor 插件）
+3. 签名：File → Project Structure → Signing Configs → 勾 Automatically generate signature
+   这一步会用你的华为开发者账号在 AGC 里自动申请调试证书和 Profile，
+   同时要把手机 UDID 登记进调试设备（手机上：设置→关于手机→连点版本号→开发者选项→USB调试，
+   电脑 hdc shell 后执行 bm get --udid）
+4. Build → Build Hap(s)，产物在 entry/build/default/outputs/default/entry-default-signed.hap
+5. 装机：hdc install entry-default-signed.hap
+
+四、重要限制
+- 调试签名的 HAP 只能装在 Profile 里登记过 UDID 的设备上，一个账号最多 100 台。
+- 想给没登记的手机装，只能走应用市场（含非公开发布），不能侧载。
+- 兼容版鸿蒙（4.x/6.1）本来就能装 APK，直接用 4.7.5 的 APK 更省事，这套 HAP 是给纯血鸿蒙准备的。
+
+五、改版本
+app.json5 里 versionCode / versionName，以及 rawfile/index.html 里的 APP_VER / APP_CODE，两处要一起改。
+
+六、以后想换 UI
+只改 rawfile/index.html 就行，ArkTS 那边不用动。
