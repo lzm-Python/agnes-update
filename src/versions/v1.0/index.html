@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Agnes 视频</title>
+<style>
+:root{--bg:#0d1117;--panel:#161b22;--line:#262d38;--txt:#e6edf3;--dim:#8b949e;--acc:#2f81f7;--ok:#3fb950;--bad:#f85149}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;background:var(--bg);color:var(--txt);font:15px/1.6 -apple-system,"Segoe UI","Microsoft YaHei",sans-serif;padding:14px 14px 28px}
+h1{font-size:17px;margin:0 0 2px;font-weight:600}
+.sub{color:var(--dim);font-size:12px;margin-bottom:12px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:13px;margin-bottom:11px}
+label{display:block;font-size:12px;color:var(--dim);margin:9px 0 5px}
+input,textarea,select{width:100%;background:#0d1117;border:1px solid var(--line);color:var(--txt);border-radius:8px;padding:10px;font-size:15px;font-family:inherit}
+textarea{resize:vertical;min-height:76px}
+.row{display:flex;gap:9px}
+.row>div{flex:1}
+button{background:var(--acc);color:#fff;border:0;border-radius:8px;padding:12px;font-size:15px;font-weight:600;width:100%;margin-top:12px}
+button:disabled{opacity:.45}
+button.ghost{background:transparent;border:1px solid var(--line);color:var(--txt);font-weight:400;margin-top:7px}
+.modes{display:flex;gap:7px;margin-top:5px}
+.modes button{flex:1;margin:0;background:#0d1117;border:1px solid var(--line);color:var(--dim);font-weight:400;padding:9px;font-size:13px}
+.modes button.on{border-color:var(--acc);color:#fff;background:#13233c}
+.bar{height:5px;background:#0d1117;border-radius:3px;overflow:hidden;margin:9px 0 4px}
+.bar i{display:block;height:100%;width:0;background:var(--acc);transition:width .4s}
+.st{font-size:13px;color:var(--dim);min-height:20px}
+video{width:100%;border-radius:8px;background:#000;margin-top:9px}
+.err{color:var(--bad);font-size:13px;white-space:pre-wrap;margin-top:7px}
+.hist{font-size:13px;color:var(--dim);border-top:1px solid var(--line);padding:8px 0}
+.hist span{color:var(--acc)}
+.hide{display:none}
+</style>
+</head>
+<body>
+<h1>Agnes 视频</h1>
+<div class="sub">Video 2.5 Flash · 720P · 直连 API</div>
+
+<div class="card" id="keycard">
+  <label>API Key（只存本机）</label>
+  <input id="key" type="password" placeholder="sk-..." autocomplete="off">
+  <button onclick="saveKey()">保存</button>
+</div>
+
+<div class="card">
+  <label>模式</label>
+  <div class="modes" id="modes">
+    <button data-m="text" class="on">文生</button>
+    <button data-m="keyframe">首尾帧</button>
+    <button data-m="reference">参考图</button>
+  </div>
+
+  <label>提示词</label>
+  <textarea id="prompt" placeholder="画面、动作、镜头。参考模式用 &lt;Picture 1&gt; 指代第 1 张图"></textarea>
+
+  <div id="frames" class="hide">
+    <label>首帧图 URL</label>
+    <input id="first_frame" placeholder="https://...">
+    <label>尾帧图 URL（可选）</label>
+    <input id="last_frame" placeholder="https://...">
+  </div>
+
+  <div id="refs" class="hide">
+    <label>参考图 URL（每行一个，最多 5）</label>
+    <textarea id="images" placeholder="https://..."></textarea>
+    <label>参考音频 URL（每行一个，最多 3）</label>
+    <textarea id="audios" placeholder="https://..."></textarea>
+  </div>
+
+  <div class="row">
+    <div>
+      <label>时长</label>
+      <select id="seconds">
+        <option>4</option><option selected>5</option><option>6</option><option>7</option><option>8</option>
+        <option>9</option><option>10</option><option>11</option><option>12</option>
+      </select>
+    </div>
+    <div>
+      <label>比例</label>
+      <select id="ratio">
+        <option selected>9:16</option><option>16:9</option><option>1:1</option>
+        <option>4:3</option><option>3:4</option><option>21:9</option>
+      </select>
+    </div>
+  </div>
+
+  <button id="go" onclick="start()">生成</button>
+  <div class="bar hide" id="bar"><i></i></div>
+  <div class="st" id="st"></div>
+  <div class="err" id="err"></div>
+
+  <div id="out" class="hide">
+    <video id="v" controls playsinline webkit-playsinline></video>
+    <button class="ghost" onclick="saveLocal()">保存到手机 Download</button>
+  </div>
+</div>
+
+<div class="card" id="histcard">
+  <label style="margin-top:0">最近</label>
+  <div id="hist"></div>
+</div>
+
+<script>
+const API='https://apihub.agnes-ai.com';
+const MODEL='agnes-video-2.5-flash';
+let mode='text',cur=null,timer=null;
+
+function getKey(){return localStorage.getItem('agnes_key')||''}
+function saveKey(){
+  const k=document.getElementById('key').value.trim();
+  if(!k)return;
+  localStorage.setItem('agnes_key',k);
+  document.getElementById('keycard').classList.add('hide');
+}
+function err(m){document.getElementById('err').textContent=m||''}
+function prog(p){const b=document.getElementById('bar');b.classList.remove('hide');b.querySelector('i').style.width=(p||0)+'%'}
+
+document.querySelectorAll('#modes button').forEach(function(b){
+  b.onclick=function(){
+    document.querySelectorAll('#modes button').forEach(function(x){x.classList.remove('on')});
+    b.classList.add('on');mode=b.dataset.m;
+    document.getElementById('frames').classList.toggle('hide',mode!=='keyframe');
+    document.getElementById('refs').classList.toggle('hide',mode!=='reference');
+  }
+});
+
+function lines(id){
+  return (document.getElementById(id).value||'').split('\n').map(function(s){return s.trim()}).filter(Boolean);
+}
+
+function start(){
+  err('');document.getElementById('out').classList.add('hide');
+  if(!getKey()){document.getElementById('keycard').classList.remove('hide');err('先填 API Key');return}
+  const body={model:MODEL,mode:mode,prompt:(document.getElementById('prompt').value||'').trim(),
+    seconds:document.getElementById('seconds').value,size:'720P',
+    aspect_ratio:document.getElementById('ratio').value};
+  if(!body.prompt){err('提示词不能为空');return}
+  if(mode==='keyframe'){
+    body.first_frame=document.getElementById('first_frame').value.trim();
+    body.last_frame=document.getElementById('last_frame').value.trim();
+    if(!body.first_frame&&!body.last_frame){err('首帧或尾帧至少给一个 URL');return}
+  }
+  if(mode==='reference'){
+    body.images=lines('images');body.audios=lines('audios');
+    if(!body.images.length&&!body.audios.length){err('参考图或参考音频至少给一个');return}
+  }
+  const go=document.getElementById('go');go.disabled=true;go.textContent='提交中…';
+  document.getElementById('st').textContent='提交任务…';prog(3);
+  fetch(API+'/v1/videos',{method:'POST',headers:{'Authorization':'Bearer '+getKey(),'Content-Type':'application/json'},body:JSON.stringify(body)})
+  .then(function(r){return r.json().then(function(j){return {ok:r.ok,code:r.status,j:j}})})
+  .then(function(res){
+    if(!res.ok){
+      go.disabled=false;go.textContent='生成';
+      const d=(res.j&&res.j.detail)||JSON.stringify(res.j);
+      err(res.code===401?'Key 无效或过期':('创建失败：'+d));
+      return;
+    }
+    const vid=res.j.video_id||res.j.id;
+    cur={video_id:vid,url:null,prompt:body.prompt,ts:Date.now()};
+    document.getElementById('st').textContent='任务已提交，排队中…';
+    poll(vid);
+  })
+  .catch(function(e){go.disabled=false;go.textContent='生成';err('网络请求失败：'+e.message)});
+}
+
+function poll(vid){
+  clearInterval(timer);
+  let n=0;
+  timer=setInterval(function(){
+    n++;
+    fetch(API+'/agnesapi?video_id='+encodeURIComponent(vid)+'&model_name='+MODEL,
+      {headers:{'Authorization':'Bearer '+getKey()}})
+    .then(function(r){return r.json()})
+    .then(function(j){
+      if(j.error||j.detail){
+        clearInterval(timer);document.getElementById('go').disabled=false;
+        document.getElementById('go').textContent='生成';
+        err('查询失败：'+((j.error&&j.error.detail)||j.detail));return;
+      }
+      const p=typeof j.progress==='number'?j.progress:0;
+      prog(p);
+      document.getElementById('st').textContent='状态 '+j.status+' · '+p+'%';
+      if(j.status==='completed'){
+        clearInterval(timer);
+        prog(100);document.getElementById('st').textContent='完成';
+        cur.url=j.url;cur.video_id=vid;
+        document.getElementById('v').src=j.url;
+        document.getElementById('out').classList.remove('hide');
+        document.getElementById('go').disabled=false;document.getElementById('go').textContent='生成';
+        addHist(cur);
+      }else if(j.status==='failed'){
+        clearInterval(timer);document.getElementById('go').disabled=false;
+        document.getElementById('go').textContent='生成';
+        err('任务失败：'+JSON.stringify(j.error||j));
+      }else if(n>150){
+        clearInterval(timer);document.getElementById('go').disabled=false;
+        document.getElementById('go').textContent='生成';err('超时，请到网页端查看任务');
+      }
+    })
+    .catch(function(){});
+  },2000);
+}
+
+function saveLocal(){
+  if(!cur||!cur.url)return;
+  if(window.Android&&Android.saveVideo){Android.saveVideo(cur.url,cur.prompt||'agnes')}
+  else{window.open(cur.url,'_blank')}
+}
+
+function addHist(item){
+  let arr=[];
+  try{arr=JSON.parse(localStorage.getItem('agnes_hist')||'[]')}catch(e){}
+  arr.push({url:item.url,video_id:item.video_id,prompt:item.prompt,ts:item.ts});
+  arr=arr.slice(-30);
+  localStorage.setItem('agnes_hist',JSON.stringify(arr));
+  renderHist();
+}
+
+function renderHist(){
+  const box=document.getElementById('hist');box.innerHTML='';
+  let arr=[];
+  try{arr=JSON.parse(localStorage.getItem('agnes_hist')||'[]')}catch(e){}
+  arr.slice().reverse().forEach(function(it){
+    const d=document.createElement('div');d.className='hist';
+    d.textContent=(it.prompt||'').slice(0,24)+' '+new Date(it.ts).toLocaleTimeString();
+    d.onclick=function(){
+      cur={url:it.url,prompt:it.prompt};
+      document.getElementById('v').src=it.url;
+      document.getElementById('out').classList.remove('hide');
+      window.scrollTo({top:0,behavior:'smooth'});
+    };
+    box.appendChild(d);
+  });
+}
+
+(function init(){
+  if(getKey())document.getElementById('keycard').classList.add('hide');
+  renderHist();
+})();
+</script>
+</body>
+</html>
