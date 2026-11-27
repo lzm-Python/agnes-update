@@ -1,0 +1,13 @@
+{
+  "modelVersion": "5.0.0",
+  "name": "agnes_harmony",
+  "version": "1.0.0",
+  "description": "Agnes 工作台 鸿蒙外壳",
+  "main": "",
+  "author": "agnes",
+  "license": "",
+  "dependencies": {},
+  "devDependencies": {
+    "@ohos/hvigor-ohos-plugin": "5.0.0"
+  }
+}
