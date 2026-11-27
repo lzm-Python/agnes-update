@@ -1,0 +1,9 @@
+{
+  "name": "entry",
+  "version": "1.0.0",
+  "description": "Agnes 工作台 鸿蒙入口",
+  "main": "",
+  "author": "agnes",
+  "license": "",
+  "dependencies": {}
+}
