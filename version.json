@@ -1,6 +1,6 @@
 {
- "versionCode": 32,
- "versionName": "4.7",
+ "versionCode": 34,
+ "versionName": "4.7.5",
  "url": "https://github.com/lzm-Python/agnes-update/releases/latest/download/AgnesVideo.apk",
- "note": "UI 大改：白天模式为默认，可一键切黑夜；设置拆成独立整页，引擎与 Key 单列一页；底部导航重新排布；引擎扩到九家，新增 OpenRouter、Groq、Kimi"
+ "note": "更新源统一为国内直链，其余不变"
 }
