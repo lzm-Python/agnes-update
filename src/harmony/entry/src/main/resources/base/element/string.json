@@ -1,0 +1,7 @@
+{
+  "string": [
+    { "name": "module_desc", "value": "Agnes 工作台" },
+    { "name": "EntryAbility_desc", "value": "图片 视频 剧本" },
+    { "name": "EntryAbility_label", "value": "Agnes" }
+  ]
+}
