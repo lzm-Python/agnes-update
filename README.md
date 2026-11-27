@@ -1,19 +1,10 @@
-# Agnes 工作台 · 安装包存档
+# Agnes 工作台
 
-本仓库保存 Agnes 工作台全部历史版本，同时作为 App 的自动更新源。
+AI 创作工作台（安卓 / Windows / Linux / 鸿蒙），一套前端挂九家模型服务。
 
-- 自动更新源：`version.json`
-- 最新版固定下载：`releases/latest/download/AgnesVideo.apk`
-- 历史版本：见右侧 Releases
+- 下载页：https://lzm-python.github.io/agnes-update/
+- 安卓最新：4.7.5　桌面最新：2.6
+- **工程源码在 [src/](src/)**，构建方法见 [src/README.md](src/README.md)
+- 协议：MIT，见 LICENSE
 
-## 说明
-
-- 包名：`com.agnes.video`
-- 最低系统：Android 5.0（API 21）
-- 签名：自签证书
-- 覆盖安装需版本号更高，或先卸载旧版
-
-## 国内访问加速
-
-- 仓库页面镜像：`kkgithub.com/lzm-Python/agnes-update`
-- 文件加速：原始链接前加 `https://gh-proxy.com/`
+keystore、签名口令、发布 token 不在仓库内。
