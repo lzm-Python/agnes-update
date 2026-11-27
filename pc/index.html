@@ -282,7 +282,7 @@ cursor:pointer;position:relative;background:transparent;border:0;font-family:inh
     <div class="shead" id="blkAbout">关于与更新</div>
     <div class="card">
       <div class="vrow" style="padding-top:0"><span>当前版本</span><b id="vernow">4.7</b></div>
-      <label>更新源地址（已内置，一般不用改）</label>
+      <label>更新源地址（已内置国内直链，一般不用改）</label>
       <input id="usrc" placeholder="留空即用内置更新源" autocomplete="off">
       <button class="btn ghost" onclick="saveUpdSrc()">保存地址</button>
       <button class="btn ghost" onclick="checkUpdate()">检查更新</button>
@@ -548,13 +548,11 @@ var IMG_MODEL=ENGINES.pavo.img;
 var VID_MODEL=ENGINES.pavo.vid;
 var TXT_MODEL=ENGINES.pavo.txt;
 
-var APP_VER='4.7',APP_CODE=32;
+var APP_VER='4.7.5',APP_CODE=34;
 
-// ===== 自动更新源（内置，按速度快慢排序）=====
+// ===== 自动更新源（内置，统一国内直链）=====
 var UPD_SRC=[
-  'https://gh-proxy.com/https://raw.githubusercontent.com/lzm-Python/agnes-update/main/version.json',
-  'https://cdn.jsdelivr.net/gh/lzm-Python/agnes-update@main/version.json',
-  'https://raw.githubusercontent.com/lzm-Python/agnes-update/main/version.json'
+  'https://gh-proxy.com/https://raw.githubusercontent.com/lzm-Python/agnes-update/main/version.json'
 ];
 var UPD_DL='https://gh-proxy.com/https://github.com/lzm-Python/agnes-update/releases/latest/download/AgnesVideo.apk';
 var UPD_ASK=1800000;      // 手动检查超时 30 秒上限（单源 4 秒）
