@@ -1,6 +1,6 @@
 {
- "versionCode": 34,
- "versionName": "4.7.5",
+ "versionCode": 35,
+ "versionName": "4.8",
  "url": "https://github.com/lzm-Python/agnes-update/releases/latest/download/AgnesVideo.apk",
- "note": "更新源统一为国内直链，其余不变"
+ "note": "4.8 界面大改：清新皮肤、侧栏历史、后台任务中心、引擎自动兜底；图标同步换新"
 }
